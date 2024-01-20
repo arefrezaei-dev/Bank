@@ -27,7 +27,9 @@ namespace Bank.Domain
         #endregion
 
         #region Factory
-
+        /// <summary>
+        /// use collection aversion to avoid using collection instead using structure to model the currencies concept 
+        /// </summary>
         private static readonly IDictionary<string, Currency> Currencies;
         static Currency()
         {
@@ -38,6 +40,9 @@ namespace Bank.Domain
                 { USDollar.Name, USDollar },
             };
         }
+        /// <summary>
+        /// static factory method pattern...for wrapping the complexity of object constructor.
+        /// </summary>
         public static Currency FromCode(string code)
         {
             if (string.IsNullOrWhiteSpace(code))

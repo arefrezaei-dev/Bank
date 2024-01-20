@@ -19,6 +19,9 @@ namespace Bank.Domain
 
         #region Properties
         public decimal Value { get; }
+        /// <summary>
+        /// micro type that wraps an already-expressive value object (micro type pattern)
+        /// </summary>
         public Currency Currency { get; }
         #endregion
 
@@ -56,7 +59,10 @@ namespace Bank.Domain
         }
 
         public static Money Zero(Currency currency) => new Money(currency, 0);
-
+        /// <summary>
+        /// overriding ToString to return a uniqe description in a persistence-ready format (persistence format pattern) 
+        /// </summary>
+        /// <returns></returns>
         public override string ToString() => $"{Value} {Currency}";
         #endregion
     }

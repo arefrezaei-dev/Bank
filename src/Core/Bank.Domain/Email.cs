@@ -26,6 +26,5 @@ namespace Bank.Domain
 
         public override string ToString()
            => this.Value;
-
     }
 }
