@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bank.Domain.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Bank.Domain
 {
-    public class Customer
+    public record Customer : BaseAggregateRoot<Customer, Guid>
     {
         #region Constructor
         public Customer() { }
@@ -29,7 +30,7 @@ namespace Bank.Domain
         #endregion
 
         #region Public Methods
-        public static Customer Create(Guid customerId,string firstName,string lastName,string email)
+        public static Customer Create(Guid customerId, string firstName, string lastName, string email)
         {
             return new Customer(customerId, firstName, lastName, new Email(email));
         }
