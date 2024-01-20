@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bank.Persistence.SQLServer.DBContext
+namespace Bank.Persistence.SQLServer
 {
-    internal class CustomerDbContext
-    {
-    }
+    public record CustomerEmail(Guid CustomerId, string Email);
 }
