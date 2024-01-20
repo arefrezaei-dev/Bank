@@ -1,6 +1,8 @@
-﻿using MediatR;
+﻿using Bank.Domain.DomainServices;
+using MediatR;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,9 +25,23 @@ namespace Bank.Domain.Commands
     }
     public class CreateCustomerHandler : IRequestHandler<CreateCustomer>
     {
+        private readonly ICustomerEmailsService _customerEmailsService;
+
+        public CreateCustomerHandler(ICustomerEmailsService customerEmailsService)
+        {
+            _customerEmailsService = customerEmailsService;
+        }
+
         public async Task Handle(CreateCustomer command, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(command.Email))
+                throw new Exception();
+            if (await _customerEmailsService.ExistsAsync(command.Email))
+                throw new Exception();
+
+            var customer = Customer.Create(command.CustomerId, command.FirstName, command.LastName, command.Email);
+
+            await _customerEmailsService.CreateAsync(command.Email, customer.Id);
         }
     }
 }
