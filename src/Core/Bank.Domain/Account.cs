@@ -23,6 +23,7 @@ namespace Bank.Domain
         //}
 
         #endregion
+
         #region Properties
         public Guid OwnerId { get; private set; }
         public Money Balance { get; private set; }

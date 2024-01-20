@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Bank.Domain
 {
-    internal class Customer
+    public class Customer
     {
         #region Constructor
         public Customer() { }
