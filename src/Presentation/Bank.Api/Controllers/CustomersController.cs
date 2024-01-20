@@ -1,6 +1,6 @@
 ﻿using Bank.Api.DTOs;
+using Bank.Domain.Commands;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.Api.Controllers
@@ -10,13 +10,13 @@ namespace Bank.Api.Controllers
     public class CustomersController : ControllerBase
     {
         #region Fields
-        private readonly IMediator mediator;
+        private readonly IMediator _mediator;
         #endregion
 
         #region Constructor
         public CustomersController(IMediator mediator)
         {
-            this.mediator = mediator;
+            _mediator = mediator;
         }
         #endregion
 
@@ -26,9 +26,9 @@ namespace Bank.Api.Controllers
         {
             if (null == CreateCustomerDto)
                 return BadRequest();
-            //var command = new CreateCustomer(Guid.NewGuid(), dto.FirstName, dto.LastName, dto.Email);
-            //await _mediator.Send(command, cancellationToken);
-            return Ok("");
+            var command = new CreateCustomer(Guid.NewGuid(), CreateCustomerDto.FirstName, CreateCustomerDto.LastName, CreateCustomerDto.Email);
+            await _mediator.Send(command, cancellationToken);
+            return Ok();
         }
         [HttpGet, Route("{id:guid}", Name = "GetCustomer")]
         public async Task<IActionResult> GetCustomer(Guid id, CancellationToken cancellationToken = default)
