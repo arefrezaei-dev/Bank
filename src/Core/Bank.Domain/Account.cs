@@ -1,5 +1,6 @@
 ﻿using Bank.Domain.Common;
 using Bank.Domain.DomainServices;
+using Bank.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Bank.Domain
 {
-    public class Account : BaseEntity<Guid>
+    public record Account : BaseAggregateRoot<Account, Guid>
     {
         #region Constructore
         public Account() { }
