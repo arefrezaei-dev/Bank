@@ -8,6 +8,9 @@ namespace Bank.Domain.Models
 {
     public interface IAggregateRoot<out TKey> : IEntity<TKey>
     {
+        /// <summary>
+        /// keeps track of the aggregate's version
+        /// </summary>
         long Version { get; }
         IReadOnlyCollection<IDomainEvent<TKey>> Events { get; }
         void ClearEvents();

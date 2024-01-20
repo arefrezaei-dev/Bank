@@ -19,10 +19,9 @@ namespace Bank.Persistence.SQLServer
 
         public async Task CreateAsync(string email, Guid customerId, CancellationToken cancellationToken = default)
         {
-            await _dbContext.CustomerEmails.AddAsync(new CustomerEmail(customerId, email), cancellationToken)
-                .ConfigureAwait(false);
-            await _dbContext.SaveChangesAsync(cancellationToken)
-                .ConfigureAwait(false);
+            await _dbContext.CustomerEmails.AddAsync(new CustomerEmail(customerId, email), cancellationToken).ConfigureAwait(false);
+
+            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<bool> ExistsAsync(string email, CancellationToken cancellationToken = default)
