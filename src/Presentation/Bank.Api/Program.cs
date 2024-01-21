@@ -1,4 +1,5 @@
 using Bank.Api.Registries;
+using Bank.Domain.DomainServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.ConfigureMediatRPipelines();
 builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<ICurrencyConverter, FakeCurrencyConverter>();
+
 builder.Services.AddControllers();
 
 var app = builder.Build();

@@ -2,7 +2,6 @@
 using Bank.Domain;
 using Bank.Domain.Commands;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.Api.Controllers
@@ -28,8 +27,21 @@ namespace Bank.Api.Controllers
         {
             if (null == createAccountDto)
                 return BadRequest();
-            var currency=Currency.FromCode(createAccountDto.CurrencyCode);
+            var currency = Currency.FromCode(createAccountDto.CurrencyCode);
             var command = new CreateAccount(createAccountDto.CustomerId, Guid.NewGuid(), currency);
+            await _mediator.Send(command, cancellationToken);
+            return Ok();
+        }
+
+        [HttpPut, Route("{id:guid}/deposit")]
+        public async Task<IActionResult> Deposit(Guid AccountId,DepositDto depositDto,CancellationToken cancellationToken=default)
+        {
+            if (null == depositDto)
+                return BadRequest();
+
+            var currency = Currency.FromCode(depositDto.CurrencyCode);
+            var amount = new Money(currency, depositDto.Amount);
+            var command = new Deposit(AccountId, amount);
             await _mediator.Send(command, cancellationToken);
             return Ok();
         }
