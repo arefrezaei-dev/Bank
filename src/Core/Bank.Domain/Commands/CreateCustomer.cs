@@ -1,4 +1,5 @@
 ﻿using Bank.Domain.DomainServices;
+using Bank.Domain.IntegrationEvents;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -26,10 +27,12 @@ namespace Bank.Domain.Commands
     public class CreateCustomerHandler : IRequestHandler<CreateCustomer>
     {
         private readonly ICustomerEmailsService _customerEmailsService;
+        private readonly IAggregateRepository<Customer,Guid> _eventsService;
 
-        public CreateCustomerHandler(ICustomerEmailsService customerEmailsService)
+        public CreateCustomerHandler(ICustomerEmailsService customerEmailsService, IAggregateRepository<Customer, Guid> eventsService)
         {
             _customerEmailsService = customerEmailsService;
+            _eventsService = eventsService;
         }
 
         public async Task Handle(CreateCustomer command, CancellationToken cancellationToken)
@@ -41,7 +44,12 @@ namespace Bank.Domain.Commands
 
             var customer = Customer.Create(command.CustomerId, command.FirstName, command.LastName, command.Email);
 
+            await _eventsService.PersistAsync(customer);
             await _customerEmailsService.CreateAsync(command.Email, customer.Id);
+
+            var @event = new CustomerCreated(Guid.NewGuid(),command.CustomerId);
+
+            //await _eventProducer.DispatchAsync(@event, cancellationToken);
         }
     }
 }
