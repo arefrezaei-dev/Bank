@@ -10,6 +10,7 @@ namespace Bank.Domain.Models
     {
         /// <summary>
         /// keeps track of the aggregate's version
+        /// resolving conflicts during writes or building the query models
         /// </summary>
         long Version { get; }
         IReadOnlyCollection<IDomainEvent<TKey>> Events { get; }
