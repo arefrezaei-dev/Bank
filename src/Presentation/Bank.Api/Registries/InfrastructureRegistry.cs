@@ -3,6 +3,8 @@ using Bank.Domain.DomainEvents;
 using Bank.Domain.DomainServices;
 using Bank.Persistence.SQLServer;
 using Bank.Persistence.SQLServer.EventSourcing;
+using BuildingBlocks.RabbitMQ;
+using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +19,9 @@ namespace Bank.Api.Registries
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
         {
             var infraConfig = config.GetSection("infrastructure").Get<Infrastructure>();
-            return services.RegisterAggregateStore(config, infraConfig);
+            return services
+                .RegisterAggregateStore(config, infraConfig)
+                .RegisterEventBus(config, infraConfig);
         }
         private static IServiceCollection RegisterAggregateStore(this IServiceCollection services, IConfiguration config, Infrastructure infraConfig)
         {
@@ -35,7 +39,30 @@ namespace Bank.Api.Registries
             }
             return services;
         }
-        public static void ConfigureMediatRPipelines(this IServiceCollection services)
+        private static IServiceCollection RegisterEventBus(this IServiceCollection services, IConfiguration config, Infrastructure infraConfig)
+        {
+            var rabbitOptions = config.GetSection("RabbitMQSettings").Get<RabbitMqOptions>();
+
+            if (infraConfig.EventBus == "RabbitMQ")
+            {
+                services.AddMassTransit(config =>
+                 {
+                     config.UsingRabbitMq((ctx, conf) =>
+                     {
+                         conf.Host(rabbitOptions.HostName, rabbitOptions.Port ?? 5672, "/", h =>
+                         {
+                             h.Username(rabbitOptions.UserName);
+                             h.Password(rabbitOptions.Password);
+                         });
+                     });
+                 });
+            }
+
+            else throw new ArgumentOutOfRangeException($"invalid event bus type: {infraConfig.EventBus}");
+
+            return services;
+        }
+        public static IServiceCollection ConfigureMediatRPipelines(this IServiceCollection services)
         {
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(
                 typeof(CreateCustomer).Assembly));
@@ -44,6 +71,8 @@ namespace Bank.Api.Registries
             {
                 typeof(CustomerEvents.CustomerCreated).Assembly
             }));
+
+            return services;
         }
     }
 }

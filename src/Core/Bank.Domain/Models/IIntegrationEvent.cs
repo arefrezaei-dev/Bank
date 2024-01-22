@@ -9,5 +9,6 @@ namespace Bank.Domain.Models
     public interface IIntegrationEvent
     {
         Guid Id { get; }
+        public DateTime OccurredOn => DateTime.Now;
     }
 }
