@@ -1,5 +1,6 @@
 using Bank.Api.Registries;
 using Bank.Domain.DomainServices;
+using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 

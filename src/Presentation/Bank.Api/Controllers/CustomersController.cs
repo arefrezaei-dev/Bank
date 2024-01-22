@@ -32,14 +32,17 @@ namespace Bank.Api.Controllers
             return Ok();
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get(CancellationToken cancellationToken = default)
+        [HttpGet(Name = "GetCustomer)")]
+        public async Task<IActionResult> GetCustomer(Guid customerId, CancellationToken cancellationToken = default)
         {
-            var query = new CustomersArchive();
-            var results = await _mediator.Send(query, cancellationToken);
-            if (null == results)
+            var query = new CustomerById(customerId);
+
+            var result = await _mediator.Send(query, cancellationToken);
+
+            if (null == result)
                 return NotFound();
-            return Ok(results);
+
+            return Ok(result);
         }
         #endregion
     }
