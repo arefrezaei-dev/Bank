@@ -1,7 +1,7 @@
 ﻿using Bank.Domain;
 using MediatR;
 
-namespace Bank.Api.Queries
+namespace Bank.Api.Common.Queries
 {
     public record CustomerAccountDetails(Guid id, Money balance)
     {

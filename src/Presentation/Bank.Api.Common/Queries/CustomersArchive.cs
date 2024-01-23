@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Bank.Api.Queries
+namespace Bank.Api.Common.Queries
 {
     public record CustomerArchiveItem
     {

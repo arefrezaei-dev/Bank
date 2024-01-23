@@ -1,9 +1,4 @@
 ﻿using Bank.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bank.Domain.DomainEvents
 {
@@ -27,6 +22,9 @@ namespace Bank.Domain.DomainEvents
         }
         public record AccountAdded : BaseDomainEvent<Customer, Guid>
         {
+            /// <summary>
+            /// for deserialization
+            /// </summary>
             private AccountAdded() { }
             public AccountAdded(Customer customer, Guid accountId) : base(customer)
             {

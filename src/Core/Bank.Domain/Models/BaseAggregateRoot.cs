@@ -56,7 +56,12 @@ namespace Bank.Domain.Models
             if (null == CTor)
                 throw new InvalidOperationException($"Unable to find required private parameterless constructor for Aggregate of type '{aggregateType.Name}'");
         }
-
+        /// <summary>
+        /// the process of rebuilding the state from events (stream aggregation)
+        /// </summary>
+        /// <param name="events"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public static TA Create(IEnumerable<IDomainEvent<TKey>> events)
         {
             if (null == events || !events.Any())
