@@ -1,5 +1,5 @@
-﻿using Bank.Api.DTOs;
-using Bank.Api.Queries;
+﻿using Bank.Api.Common.Queries;
+using Bank.Api.DTOs;
 using Bank.Domain.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

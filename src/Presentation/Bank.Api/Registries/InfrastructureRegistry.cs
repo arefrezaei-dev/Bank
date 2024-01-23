@@ -1,6 +1,7 @@
 ﻿using Bank.Domain.Commands;
 using Bank.Domain.DomainEvents;
 using Bank.Domain.DomainServices;
+using Bank.Persistence.Mongo;
 using Bank.Persistence.SQLServer;
 using Bank.Persistence.SQLServer.EventSourcing;
 using BuildingBlocks.RabbitMQ;
@@ -21,6 +22,7 @@ namespace Bank.Api.Registries
             var infraConfig = config.GetSection("infrastructure").Get<Infrastructure>();
             return services
                 .RegisterAggregateStore(config, infraConfig)
+                .RegisterQueryDb(config, infraConfig)
                 .RegisterEventBus(config, infraConfig);
         }
         private static IServiceCollection RegisterAggregateStore(this IServiceCollection services, IConfiguration config, Infrastructure infraConfig)
@@ -71,6 +73,20 @@ namespace Bank.Api.Registries
             {
                 typeof(CustomerEvents.CustomerCreated).Assembly
             }));
+
+            return services;
+        }
+        public static IServiceCollection RegisterQueryDb(this IServiceCollection services, IConfiguration config, Infrastructure infraConfig)
+        {
+            if (infraConfig.QueryDb == "MongoDb")
+            {
+                var mongoConnStr = config.GetConnectionString("mongo");
+                var mongoQueryDbName = config["queryDbName"];
+                var mongoConfig = new MongoConfig(mongoConnStr, mongoQueryDbName);
+                services.AddMongoDb(mongoConfig);
+            }
+
+            else throw new ArgumentOutOfRangeException($"invalid read db type: {infraConfig.QueryDb}");
 
             return services;
         }
