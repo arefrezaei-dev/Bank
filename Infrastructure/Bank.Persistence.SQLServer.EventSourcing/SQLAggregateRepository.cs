@@ -53,8 +53,7 @@ namespace Bank.Persistence.SQLServer.EventSourcing
 
             try
             {
-                var lastVersion = await this.GetLastAggregateVersionAsync(aggregateRoot, dbConn, transaction)
-                                  .ConfigureAwait(false);
+                var lastVersion = await this.GetLastAggregateVersionAsync(aggregateRoot, dbConn, transaction).ConfigureAwait(false);
                 if (lastVersion >= aggregateRoot.Version)
                     throw new ArgumentOutOfRangeException(nameof(aggregateRoot), $"aggregate version mismatch, expected {aggregateRoot.Version}, got {lastVersion}");
 
@@ -76,7 +75,12 @@ namespace Bank.Persistence.SQLServer.EventSourcing
             }
 
         }
-
+        /// <summary>
+        /// retrieving the current state of entity from events (stream aggregation process)
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task<TA> RehydrateAsync(TKey key, CancellationToken cancellationToken = default)
         {
             await _tableCreator.EnsureTableAsync<TA, TKey>(cancellationToken)
@@ -91,6 +95,7 @@ namespace Bank.Persistence.SQLServer.EventSourcing
             using var dbConn = new SqlConnection(_dbConnString);
             await dbConn.OpenAsync().ConfigureAwait(false);
 
+            //read all events for the specific stream by aggregateId
             var aggregateEvents = await dbConn.QueryAsync<AggregateEvent>(sql, new { aggregateId = key })
                                                .ConfigureAwait(false);
             if (aggregateEvents?.Any() == false)
@@ -110,6 +115,13 @@ namespace Bank.Persistence.SQLServer.EventSourcing
         #endregion
 
         #region PrivateMethods
+        /// <summary>
+        /// manage concurrency with last aggregate version
+        /// </summary>
+        /// <param name="aggregateRoot"></param>
+        /// <param name="dbConn"></param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
         private async Task<long?> GetLastAggregateVersionAsync(TA aggregateRoot, SqlConnection dbConn, IDbTransaction transaction)
         {
             var tableName = _tableCreator.GetTableName<TA, TKey>();
