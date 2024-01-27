@@ -28,11 +28,13 @@ namespace Bank.Domain.Commands
     {
         private readonly ICustomerEmailsService _customerEmailsService;
         private readonly IAggregateRepository<Customer,Guid> _eventsService;
+        private readonly IMediator mediator;
 
-        public CreateCustomerHandler(ICustomerEmailsService customerEmailsService, IAggregateRepository<Customer, Guid> eventsService)
+        public CreateCustomerHandler(ICustomerEmailsService customerEmailsService, IAggregateRepository<Customer, Guid> eventsService, IMediator mediator)
         {
             _customerEmailsService = customerEmailsService;
             _eventsService = eventsService;
+            this.mediator = mediator;
         }
 
         public async Task Handle(CreateCustomer command, CancellationToken cancellationToken)
@@ -49,7 +51,7 @@ namespace Bank.Domain.Commands
 
             var @event = new CustomerCreated(Guid.NewGuid(),command.CustomerId);
 
-            //await _eventProducer.DispatchAsync(@event, cancellationToken);
+            await mediator.Publish(@event, cancellationToken);
         }
     }
 }

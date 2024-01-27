@@ -5,6 +5,8 @@ namespace Bank.Persistence.Mongo
 {
     public interface IQueryDbContext
     {
-        IMongoCollection<CustomerDetails> CustomerDetails { get; }
+        IMongoCollection<AccountDetails> AccountsDetails { get; }
+        IMongoCollection<CustomerDetails> CustomersDetails { get; }
+        IMongoCollection<CustomerArchiveItem> Customers { get; }
     }
 }
