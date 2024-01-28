@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Presentation\Bank.Api.Common\Bank.Api.Common.csproj" />
+    <ProjectReference Include="..\Bank.Transport.RabbitMQ\Bank.Transport.RabbitMQ.csproj" />
   </ItemGroup>
 
 </Project>

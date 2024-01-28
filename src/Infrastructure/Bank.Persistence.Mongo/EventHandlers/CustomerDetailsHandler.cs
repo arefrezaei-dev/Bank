@@ -3,6 +3,8 @@ using Bank.Api.Common.Queries;
 using Bank.Domain;
 using Bank.Domain.DomainServices;
 using Bank.Domain.IntegrationEvents;
+using MassTransit;
+using MassTransit.Middleware;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -10,11 +12,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Bank.Persistence.Mongo.EventHandlers
 {
-    public class CustomerDetailsHandler : INotificationHandler<CustomerCreated>
+    public class CustomerDetailsHandler : IConsumer<CustomerCreated>
     {
         #region Fields
         private readonly ILogger<CustomerDetailsHandler> _logger;
@@ -37,16 +40,24 @@ namespace Bank.Persistence.Mongo.EventHandlers
             _currencyConverter = currencyConverter;
             _db = db;
         }
+
+        public async Task Consume(ConsumeContext<CustomerCreated> context)
+        {
+            _logger.LogInformation("creating customer details for customer {CustomerId} ...", context.Message.CustomerId);
+
+            var customerView = await BuildCustomerViewAsync(context.Message.CustomerId,new CancellationToken());
+            await SaveCustomerViewAsync(customerView, new CancellationToken());
+        }
         #endregion
 
         #region Handlers
-        public async Task Handle(CustomerCreated @event, CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("creating customer details for customer {CustomerId} ...", @event.CustomerId);
+        //public async Task Handle(CustomerCreated @event, CancellationToken cancellationToken)
+        //{
+        //    _logger.LogInformation("creating customer details for customer {CustomerId} ...", @event.CustomerId);
 
-            var customerView = await BuildCustomerViewAsync(@event.CustomerId, cancellationToken);
-            await SaveCustomerViewAsync(customerView, cancellationToken);
-        }
+        //    var customerView = await BuildCustomerViewAsync(@event.CustomerId, cancellationToken);
+        //    await SaveCustomerViewAsync(customerView, cancellationToken);
+        //}
         #endregion
 
         #region PrivateMethods

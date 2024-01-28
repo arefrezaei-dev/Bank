@@ -1,4 +1,5 @@
 ﻿using Bank.Domain.DomainServices;
+using Bank.Domain.EventBus;
 using Bank.Domain.IntegrationEvents;
 using MediatR;
 using System;
@@ -28,13 +29,13 @@ namespace Bank.Domain.Commands
     {
         private readonly ICustomerEmailsService _customerEmailsService;
         private readonly IAggregateRepository<Customer,Guid> _eventsService;
-        private readonly IMediator mediator;
+        private readonly IEventBus _eventBus;
 
-        public CreateCustomerHandler(ICustomerEmailsService customerEmailsService, IAggregateRepository<Customer, Guid> eventsService, IMediator mediator)
+        public CreateCustomerHandler(ICustomerEmailsService customerEmailsService, IAggregateRepository<Customer, Guid> eventsService, IEventBus eventBus)
         {
             _customerEmailsService = customerEmailsService;
             _eventsService = eventsService;
-            this.mediator = mediator;
+            _eventBus = eventBus;
         }
 
         public async Task Handle(CreateCustomer command, CancellationToken cancellationToken)
@@ -49,9 +50,11 @@ namespace Bank.Domain.Commands
             await _eventsService.PersistAsync(customer);
             await _customerEmailsService.CreateAsync(command.Email, customer.Id);
 
+            //system crash or event bus can be unavailable 
+
             var @event = new CustomerCreated(Guid.NewGuid(),command.CustomerId);
 
-            await mediator.Publish(@event, cancellationToken);
+            await _eventBus.PublishAsync(@event, cancellationToken);
         }
     }
 }

@@ -1,15 +1,16 @@
 ﻿using Bank.Domain.Commands;
 using Bank.Domain.DomainEvents;
 using Bank.Domain.DomainServices;
+using Bank.Domain.EventBus;
+using Bank.Domain.IntegrationEvents;
 using Bank.Persistence.Mongo;
+using Bank.Persistence.Mongo.EventHandlers;
 using Bank.Persistence.SQLServer;
 using Bank.Persistence.SQLServer.EventSourcing;
-using BuildingBlocks.RabbitMQ;
+using Bank.Transport.RabbitMQ;
 using MassTransit;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
+using RabbitMQ.Client;
 
 namespace Bank.Api.Registries
 {
@@ -49,6 +50,10 @@ namespace Bank.Api.Registries
             {
                 services.AddMassTransit(config =>
                  {
+                     config.SetKebabCaseEndpointNameFormatter();
+
+                     config.AddConsumer<CustomerDetailsHandler>();
+
                      config.UsingRabbitMq((ctx, conf) =>
                      {
                          conf.Host(rabbitOptions.HostName, rabbitOptions.Port ?? 5672, "/", h =>
@@ -56,8 +61,15 @@ namespace Bank.Api.Registries
                              h.Username(rabbitOptions.UserName);
                              h.Password(rabbitOptions.Password);
                          });
+                         conf.ReceiveEndpoint(EventBusConstants.CustomerCreated, c =>
+                         {
+                             c.ConfigureConsumer<CustomerDetailsHandler>(ctx);
+                         });
                      });
                  });
+                services.AddTransient<IEventBus,EventBus>();
+                //services.AddScoped<CustomerDetailsHandler>();
+
             }
 
             else throw new ArgumentOutOfRangeException($"invalid event bus type: {infraConfig.EventBus}");

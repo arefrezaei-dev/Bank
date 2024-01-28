@@ -16,6 +16,7 @@
     <ProjectReference Include="..\..\..\Infrastructure\Bank.Persistence.SQLServer\Bank.Persistence.SQLServer.csproj" />
     <ProjectReference Include="..\..\Core\Bank.Domain\Bank.Domain.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Bank.Persistence.Mongo\Bank.Persistence.Mongo.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Bank.Transport.RabbitMQ\Bank.Transport.RabbitMQ.csproj" />
   </ItemGroup>
 
 </Project>
