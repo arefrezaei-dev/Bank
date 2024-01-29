@@ -51,9 +51,7 @@ namespace Bank.Api.Registries
                 services.AddMassTransit(config =>
                  {
                      config.SetKebabCaseEndpointNameFormatter();
-
-                     config.AddConsumer<CustomerDetailsHandler>();
-
+                     
                      config.UsingRabbitMq((ctx, conf) =>
                      {
                          conf.Host(rabbitOptions.HostName, rabbitOptions.Port ?? 5672, "/", h =>
@@ -61,15 +59,10 @@ namespace Bank.Api.Registries
                              h.Username(rabbitOptions.UserName);
                              h.Password(rabbitOptions.Password);
                          });
-                         conf.ReceiveEndpoint(EventBusConstants.CustomerCreated, c =>
-                         {
-                             c.ConfigureConsumer<CustomerDetailsHandler>(ctx);
-                         });
+                         conf.ConfigureEndpoints(ctx);
                      });
                  });
                 services.AddTransient<IEventBus,EventBus>();
-                //services.AddScoped<CustomerDetailsHandler>();
-
             }
 
             else throw new ArgumentOutOfRangeException($"invalid event bus type: {infraConfig.EventBus}");

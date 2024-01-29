@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Persistence.Mongo", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Api.Common", "src\Presentation\Bank.Api.Common\Bank.Api.Common.csproj", "{E4260B9E-C8BC-4456-AB6D-938D388A9118}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Worker.Core", "src\Presentation\Bank.Worker.Core\Bank.Worker.Core.csproj", "{78BD9FB6-5F34-42A1-B37F-5AE8A1B805BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{E4260B9E-C8BC-4456-AB6D-938D388A9118}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4260B9E-C8BC-4456-AB6D-938D388A9118}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4260B9E-C8BC-4456-AB6D-938D388A9118}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78BD9FB6-5F34-42A1-B37F-5AE8A1B805BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78BD9FB6-5F34-42A1-B37F-5AE8A1B805BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78BD9FB6-5F34-42A1-B37F-5AE8A1B805BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78BD9FB6-5F34-42A1-B37F-5AE8A1B805BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -85,6 +91,7 @@ Global
 		{48C21E88-84E6-4F02-A0C4-57E7859D7D98} = {A8DA3FC7-9943-4A66-BCCD-386F60197D20}
 		{BFE0943A-4006-44B4-92D7-74A279DAF217} = {A8DA3FC7-9943-4A66-BCCD-386F60197D20}
 		{E4260B9E-C8BC-4456-AB6D-938D388A9118} = {07A34736-8CCB-48F2-AEAA-F91AA3145E46}
+		{78BD9FB6-5F34-42A1-B37F-5AE8A1B805BE} = {07A34736-8CCB-48F2-AEAA-F91AA3145E46}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {20F09E40-DDB1-48B9-9175-CEF81C42FD36}
