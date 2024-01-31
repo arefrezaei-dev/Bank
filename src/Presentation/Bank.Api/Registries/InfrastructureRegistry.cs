@@ -1,4 +1,5 @@
-﻿using Bank.Domain.Commands;
+﻿using Bank.Api.Common;
+using Bank.Domain.Commands;
 using Bank.Domain.DomainEvents;
 using Bank.Domain.DomainServices;
 using Bank.Domain.EventBus;
@@ -9,6 +10,7 @@ using Bank.Persistence.SQLServer;
 using Bank.Persistence.SQLServer.EventSourcing;
 using Bank.Transport.RabbitMQ;
 using MassTransit;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 
@@ -24,7 +26,14 @@ namespace Bank.Api.Registries
             return services
                 .RegisterAggregateStore(config, infraConfig)
                 .RegisterQueryDb(config, infraConfig)
-                .RegisterEventBus(config, infraConfig);
+                .RegisterEventBus(config, infraConfig)
+                .Scan(scan =>
+                 {
+                     scan.FromAssembliesOf(typeof(CustomerDetailsHandler))
+                         .RegisterHandlers(typeof(IRequestHandler<>))
+                         .RegisterHandlers(typeof(IRequestHandler<,>))
+                         .RegisterHandlers(typeof(INotificationHandler<>));
+                 });
         }
         private static IServiceCollection RegisterAggregateStore(this IServiceCollection services, IConfiguration config, Infrastructure infraConfig)
         {
@@ -86,7 +95,6 @@ namespace Bank.Api.Registries
         {
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(
                 typeof(CreateCustomer).Assembly));
-
             services.AddSingleton<IEventSerializer>(new JsonEventSerializer(new[]
             {
                 typeof(CustomerEvents.CustomerCreated).Assembly
