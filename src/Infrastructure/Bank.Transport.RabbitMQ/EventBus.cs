@@ -25,8 +25,6 @@ namespace Bank.Transport.RabbitMQ
             _logger = logger;
             _publishEndpoint = publishEndpoint;
         }
-        #endregion
-
 
         public async Task PublishAsync(IIntegrationEvent @event, CancellationToken cancellationToken = default)
         {
@@ -40,5 +38,6 @@ namespace Bank.Transport.RabbitMQ
 
             await _publishEndpoint.Publish(@event, cancellationToken);
         }
+        #endregion
     }
 }

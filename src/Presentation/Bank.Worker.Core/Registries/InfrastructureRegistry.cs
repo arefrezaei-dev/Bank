@@ -6,6 +6,7 @@ using Bank.Transport.RabbitMQ;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RabbitMQ.Client;
 using System.Text.Json;
 
 namespace Bank.Worker.Core.Registries
@@ -26,7 +27,7 @@ namespace Bank.Worker.Core.Registries
 
             return services.AddMongoDb(mongoConfig)
                 .RegisterAggregateStore(configuration, infraConfig)
-                .RegisterRabbitMQ(configuration, rabbitOptions);
+            .RegisterRabbitMQ(configuration, rabbitOptions);
         }
 
         private static IServiceCollection RegisterAggregateStore(this IServiceCollection services, IConfiguration config, InfrastructureConfig infraConfig)
@@ -56,29 +57,20 @@ namespace Bank.Worker.Core.Registries
                         h.Username(rabbitMqOptions.UserName);
                         h.Password(rabbitMqOptions.Password);
                     });
-                    conf.ReceiveEndpoint(EventBusConstants.CustomerCreated, c =>
+                    conf.ReceiveEndpoint("send-customer-events", c =>
                     {
+                        c.ConfigureConsumeTopology = false;
                         c.ConfigureConsumer<CustomerDetailsHandler>(ctx);
+                        c.Bind("messages", e =>
+                        {
+                            e.RoutingKey = "customer-created";
+                            e.ExchangeType = ExchangeType.Direct;
+                        });
                     });
                 });
             });
             services.AddScoped<CustomerDetailsHandler>();
-            
-
             return services;
-        }
-
-
-
-    }
-
-    public class NotificationCreatedConsumer : IConsumer<CustomerCreated>
-    {
-        public async Task Consume(ConsumeContext<CustomerCreated> context)
-        {
-            var serializedMessage = JsonSerializer.Serialize(context.Message, new JsonSerializerOptions { });
-
-            Console.WriteLine($"NotificationCreated event consumed. Message: {serializedMessage}");
         }
     }
 }
