@@ -42,61 +42,51 @@ namespace Bank.Persistence.Mongo.EventHandlers
 
         public async Task Consume(ConsumeContext<CustomerCreated> context)
         {
-            //_logger.LogInformation("creating customer details for customer {CustomerId} ...", context.Message.CustomerId);
-            //var customerView = await BuildCustomerViewAsync(context.Message.CustomerId, new CancellationToken());
-            //await SaveCustomerViewAsync(customerView, new CancellationToken());
-            var s = context.Message;
+            _logger.LogInformation("creating customer details for customer {CustomerId} ...", context.Message.CustomerId);
+
+            var customerView = await BuildCustomerViewAsync(context.Message.CustomerId, context.CancellationToken);
+            await SaveCustomerViewAsync(customerView, context.CancellationToken);
         }
 
-        #region Handlers
-        //public async Task Handle(CustomerCreated @event, CancellationToken cancellationToken)
-        //{
-        //    _logger.LogInformation("creating customer details for customer {CustomerId} ...", @event.CustomerId);
-
-        //    var customerView = await BuildCustomerViewAsync(@event.CustomerId, cancellationToken);
-        //    await SaveCustomerViewAsync(customerView, cancellationToken);
-        //}
-        #endregion
-
         #region PrivateMethods
-        //private async Task<CustomerDetails> BuildCustomerViewAsync(Guid customerId, CancellationToken cancellationToken)
-        //{
-        //    var customer = await _customersRepo.RehydrateAsync(customerId, cancellationToken);
+        private async Task<CustomerDetails> BuildCustomerViewAsync(Guid customerId, CancellationToken cancellationToken)
+        {
+            var customer = await _customersRepo.RehydrateAsync(customerId, cancellationToken);
 
-        //    var totalBalance = Money.Zero(Currency.CanadianDollar);
-        //    var accounts = new CustomerAccountDetails[customer.Accounts.Count];
+            var totalBalance = Money.Zero(Currency.CanadianDollar);
+            var accounts = new CustomerAccountDetails[customer.Accounts.Count];
 
-        //    int index = 0;
-        //    foreach (var id in customer.Accounts)
-        //    {
-        //        var account = await _accountsRepo.RehydrateAsync(id, cancellationToken);
-        //        accounts[index++] = CustomerAccountDetails.Map(account);
+            int index = 0;
+            foreach (var id in customer.Accounts)
+            {
+                var account = await _accountsRepo.RehydrateAsync(id, cancellationToken);
+                accounts[index++] = CustomerAccountDetails.Map(account);
 
-        //        totalBalance = totalBalance.Add(account.Balance, _currencyConverter);
-        //    }
-        //    var customerView = new CustomerDetails(customer.Id, customer.FirstName, customer.LastName, customer.Email.Value, accounts, totalBalance);
-        //    return customerView;
-        //}
+                totalBalance = totalBalance.Add(account.Balance, _currencyConverter);
+            }
+            var customerView = new CustomerDetails(customer.Id, customer.FirstName, customer.LastName, customer.Email.Value, accounts, totalBalance);
+            return customerView;
+        }
 
-        //private async Task SaveCustomerViewAsync(CustomerDetails customerView, CancellationToken cancellationToken)
-        //{
-        //    var filter = Builders<CustomerDetails>.Filter.Eq(a => a.Id, customerView.Id);
+        private async Task SaveCustomerViewAsync(CustomerDetails customerView, CancellationToken cancellationToken)
+        {
+            var filter = Builders<CustomerDetails>.Filter.Eq(a => a.Id, customerView.Id);
 
-        //    var update = Builders<CustomerDetails>.Update
-        //        .Set(a => a.Id, customerView.Id)
-        //        .Set(a => a.FirstName, customerView.FirstName)
-        //        .Set(a => a.LastName, customerView.LastName)
-        //        .Set(a => a.Email, customerView.Email)
-        //        .Set(a => a.Accounts, customerView.Accounts)
-        //        .Set(a => a.TotalBalance, customerView.TotalBalance);
+            var update = Builders<CustomerDetails>.Update
+                .Set(a => a.Id, customerView.Id)
+                .Set(a => a.FirstName, customerView.FirstName)
+                .Set(a => a.LastName, customerView.LastName)
+                .Set(a => a.Email, customerView.Email)
+                .Set(a => a.Accounts, customerView.Accounts)
+                .Set(a => a.TotalBalance, customerView.TotalBalance);
 
-        //    await _db.CustomersDetails.UpdateOneAsync(filter,
-        //        cancellationToken: cancellationToken,
-        //        update: update,
-        //        options: new UpdateOptions() { IsUpsert = true });
+            await _db.CustomersDetails.UpdateOneAsync(filter,
+                cancellationToken: cancellationToken,
+                update: update,
+                options: new UpdateOptions() { IsUpsert = true });
 
-        //    _logger.LogInformation($"updated customer details for customer {customerView.Id}");
-        //}
+            _logger.LogInformation($"updated customer details for customer {customerView.Id}");
+        }
         #endregion
     }
 

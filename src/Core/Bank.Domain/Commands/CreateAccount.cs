@@ -1,4 +1,5 @@
 ﻿using Bank.Domain.IntegrationEvents;
+using MassTransit;
 using MediatR;
 
 namespace Bank.Domain.Commands
@@ -19,10 +20,13 @@ namespace Bank.Domain.Commands
     {
         private readonly IAggregateRepository<Customer, Guid> _customerEventsService;
         private readonly IAggregateRepository<Account, Guid> _accountEventsService;
-        public CreateAccountHandler(IAggregateRepository<Customer, Guid> customerEventsService, IAggregateRepository<Account, Guid> accountEventsService)
+        private readonly IPublishEndpoint _publishEndpoint;
+
+        public CreateAccountHandler(IAggregateRepository<Customer, Guid> customerEventsService, IAggregateRepository<Account, Guid> accountEventsService, IPublishEndpoint publishEndpoint)
         {
             _customerEventsService = customerEventsService;
             _accountEventsService = accountEventsService;
+            _publishEndpoint = publishEndpoint;
         }
         public async Task Handle(CreateAccount command, CancellationToken cancellationToken)
         {
@@ -36,7 +40,7 @@ namespace Bank.Domain.Commands
             await _accountEventsService.PersistAsync(account);
 
             var @event = new AccountCreated(Guid.NewGuid(), account.Id);
-            //await _eventProducer.DispatchAsync(@event, cancellationToken);
+            await _publishEndpoint.Publish<AccountCreated>(@event, cancellationToken);
         }
     }
 }
