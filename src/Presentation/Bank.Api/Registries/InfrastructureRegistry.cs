@@ -44,6 +44,19 @@ namespace Bank.Api.Registries
         }
         private static IServiceCollection RegisterEventBus(this IServiceCollection services, IConfiguration config, Infrastructure infraConfig)
         {
+            //services.AddMassTransit(x =>
+            //{
+            //    x.UsingRabbitMq((ctx, conf) =>
+            //    {
+
+            //        conf.Host("localhost", 5672, "/", h =>
+            //        {
+            //            h.Username("guest");
+            //            h.Password("guest");
+            //        });
+            //        conf.ConfigureEndpoints(ctx);
+            //    });
+            //});
             var rabbitOptions = config.GetSection("RabbitMQSettings").Get<RabbitMqOptions>();
 
             if (infraConfig.EventBus == "RabbitMQ")
@@ -51,7 +64,7 @@ namespace Bank.Api.Registries
                 services.AddMassTransit(config =>
                  {
                      config.SetKebabCaseEndpointNameFormatter();
-                     
+
                      config.UsingRabbitMq((ctx, conf) =>
                      {
                          conf.Host(rabbitOptions.HostName, rabbitOptions.Port ?? 5672, "/", h =>
@@ -62,7 +75,7 @@ namespace Bank.Api.Registries
                          conf.ConfigureEndpoints(ctx);
                      });
                  });
-                services.AddTransient<IEventBus,EventBus>();
+                services.AddTransient<IEventBus, EventBus>();
             }
 
             else throw new ArgumentOutOfRangeException($"invalid event bus type: {infraConfig.EventBus}");

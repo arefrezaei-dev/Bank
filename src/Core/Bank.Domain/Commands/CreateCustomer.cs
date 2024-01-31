@@ -1,6 +1,7 @@
 ﻿using Bank.Domain.DomainServices;
 using Bank.Domain.EventBus;
 using Bank.Domain.IntegrationEvents;
+using MassTransit;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -30,12 +31,15 @@ namespace Bank.Domain.Commands
         private readonly ICustomerEmailsService _customerEmailsService;
         private readonly IAggregateRepository<Customer,Guid> _eventsService;
         private readonly IEventBus _eventBus;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public CreateCustomerHandler(ICustomerEmailsService customerEmailsService, IAggregateRepository<Customer, Guid> eventsService, IEventBus eventBus)
+
+        public CreateCustomerHandler(ICustomerEmailsService customerEmailsService, IAggregateRepository<Customer, Guid> eventsService, IEventBus eventBus, IPublishEndpoint publishEndpoint)
         {
             _customerEmailsService = customerEmailsService;
             _eventsService = eventsService;
             _eventBus = eventBus;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task Handle(CreateCustomer command, CancellationToken cancellationToken)
@@ -54,7 +58,8 @@ namespace Bank.Domain.Commands
 
             var @event = new CustomerCreated(Guid.NewGuid(),command.CustomerId);
 
-            await _eventBus.PublishAsync(@event, cancellationToken);
+            //await _eventBus.PublishAsync(@event, cancellationToken);
+            await _publishEndpoint.Publish<CustomerCreated>(@event, cancellationToken);
         }
     }
 }
